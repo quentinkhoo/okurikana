@@ -1,0 +1,250 @@
+/* --- Global Styles & Variables --- */
+:root {
+    /* ✨ Playful Light Theme (Pikachu & Spongebob inspired) */
+    --bg-color: #F3E5AB; /* Soft vanilla yellow */
+    --surface-color: #FFFFFF;
+    --text-color: #8B5E34; /* A richer brown for better contrast */
+    --accent-color: #FF6347;
+    --border-color: #D3C592; /* A darker shade of the BG for borders */
+    --placeholder-color: #A1A1A1;
+    --shadow-color: rgba(211, 197, 146, 0.4);
+
+    /* Font Families */
+    --font-heading: 'Balsamiq Sans', cursive;
+    --font-body: 'Inter', 'Noto Sans JP', sans-serif;
+    
+    /* Editor & UI Variables */
+    --editor-border-color: rgba(0, 0, 0, 0.1);
+    --accent-glow-light: rgba(255, 99, 71, 0.25);
+    --header-footer-bg: rgba(255, 255, 255, 0.6);
+}
+
+/* 🌙 Dark Theme Variables */
+body.dark-mode {
+    --bg-color: #1a1a2e;
+    --surface-color: #16213e;
+    --text-color: #e0e0e0;
+    --accent-color: #7b68ee;
+    --border-color: #0f3460;
+    --placeholder-color: #7a7a7a;
+    --shadow-color: rgba(22, 33, 62, 0.5);
+    --editor-border-color: rgba(255, 255, 255, 0.2);
+    --accent-glow-dark: rgba(123, 104, 238, 0.25);
+    --header-footer-bg: rgba(255, 255, 255, 0.05);
+}
+
+/* --- Base & Body --- */
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 1rem;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    transition: background-color 0.4s, color 0.4s;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- Main Container --- */
+.container {
+    width: 100%;
+    max-width: 48rem;
+    margin: 0 auto;
+    animation: fadeIn 0.6s ease-out both;
+}
+
+/* --- Header & Footer Panels --- */
+header {
+    position: relative;
+    text-align: center;
+    background-color: var(--header-footer-bg);
+    padding: 1rem;
+    border-radius: 1rem;
+    backdrop-filter: blur(5px);
+    margin-bottom: 1.5rem;
+}
+
+footer {
+    max-width: 500px;
+    margin: 1.5rem auto 0 auto;
+    background-color: var(--header-footer-bg);
+    padding: 1rem;
+    border-radius: 1rem;
+    backdrop-filter: blur(5px);
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.25rem, 5vw, 2.75rem);
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 0.5rem 0;
+}
+
+header p {
+    font-size: 1.125rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* --- Character Flair using Pseudo-elements --- */
+header::before, header::after {
+    content: '';
+    position: absolute;
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for perfect centering */
+    width: 90px;
+    height: 90px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: -1;
+}
+
+header::before {
+    background-image: url('../images/pikachu.png');
+    left: 20px; 
+}
+
+header::after {
+    background-image: url('../images/spongebob.png');
+    right: 20px;
+}
+
+@media (max-width: 640px) {
+    header::before, header::after { display: none; }
+}
+
+/* --- Main Editor Area --- */
+main {
+    background-color: var(--surface-color);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px -5px var(--shadow-color);
+}
+
+.editor-wrapper {
+    position: relative;
+}
+
+#editor-area {
+    width: 100%;
+    padding: 1.25rem;
+    background-color: var(--surface-color);
+    border: 2px solid var(--editor-border-color);
+    border-radius: 0.75rem;
+    font-size: 1.5rem; /* Adjusted for readability */
+    color: var(--text-color);
+    min-height: 500px; /* Adjusted size */
+    line-height: 1.8;
+    white-space: pre-wrap;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow-y: auto;
+    caret-color: var(--accent-color); 
+    background-size: 100% 1.8em;
+}
+
+#editor-area:empty::before {
+    content: attr(data-placeholder);
+    color: var(--placeholder-color);
+    pointer-events: none;
+    position: absolute;
+    opacity: 0.5;
+}
+
+/* --- Custom Scrollbar for Editor --- */
+#editor-area::-webkit-scrollbar {
+    width: 10px;
+}
+#editor-area::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 5px;
+}
+#editor-area::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 20px;
+    border: 2px solid var(--surface-color);
+}
+
+/* --- Loading Overlay --- */
+#loading-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    z-index: 10;
+    font-weight: 500;
+    transition: opacity 0.3s;
+}
+
+body.dark-mode #loading-overlay {
+    background-color: rgba(22, 33, 62, 0.85);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+/* --- Utility Class to Hide Elements --- */
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* --- Theme Toggle Button --- */
+#theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-out, background-color 0.4s, border-color 0.4s;
+    z-index: 100;
+}
+
+#theme-toggle:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+#theme-toggle:active {
+    transform: scale(0.95);
+}
