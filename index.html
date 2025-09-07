@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ふりがな自動生成ツール (Real-time)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Kuroshiro Libraries loaded from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/kuroshiro@1.2.0/dist/kuroshiro.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/kuroshiro-analyzer-kuromoji@1.1.0/dist/kuroshiro-analyzer-kuromoji.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <header class="header">
+            <h1>ふりがな自動生成ツール</h1>
+            <p>Furigana Generator</p>
+        </header>
+
+        <main class="card">
+            <div class="editor-group">
+                <label for="editor-area">
+                    テキストを入力すると自動で変換されます (Text converts automatically as you type)
+                </label>
+                <div class="editor-wrapper">
+                     <!-- Replaced textarea with a contenteditable div -->
+                     <div id="editor-area" class="textarea-input" contenteditable="false" data-placeholder="ここに文章を入力してください..."></div>
+                     <div id="loading-overlay" class="loading-overlay">
+                        <svg class="spinner" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.75V6.25m0 11.5v1.5m8.25-13.25L19 6.5m-14 11 1.25-1.25m11.5 0L19 17.5m-14-11 1.25 1.25M4.75 12H6.25m11.5 0h1.5m-13.25-8.25L6.5 5m11 14-1.25-1.25" />
+                        </svg>
+                        <p>辞書を読み込んでいます...</p>
+                     </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by the Kuroshiro library.</p>
+        </footer>
+    </div>
+
+    <!-- Script is at the end of body to ensure all elements are loaded first -->
+    <script src="script.js"></script>
+</body>
+</html>
+
