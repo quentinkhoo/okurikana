@@ -150,7 +150,7 @@ main {
     padding: 1.25rem;
     background-color: var(--surface-color);
     border: 2px solid var(--editor-border-color);
-    border-radius: 0.75rem;
+    border-radius: 0.7rem;
     font-size: 1.5rem; /* Adjusted for readability */
     color: var(--text-color);
     min-height: 500px; /* Adjusted size */
@@ -160,16 +160,8 @@ main {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
     transition: border-color 0.2s, box-shadow 0.2s;
     overflow-y: auto;
-    caret-color: var(--accent-color); 
+    caret-color: var(--text-color); 
     background-size: 100% 1.8em;
-}
-
-#editor-area:empty::before {
-    content: attr(data-placeholder);
-    color: var(--placeholder-color);
-    pointer-events: none;
-    position: absolute;
-    opacity: 0.5;
 }
 
 /* --- Custom Scrollbar for Editor --- */
@@ -184,6 +176,19 @@ main {
     background-color: var(--border-color);
     border-radius: 20px;
     border: 2px solid var(--surface-color);
+}
+
+#placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1.25rem; /* Match the editor's padding */
+    color: var(--placeholder-color);
+    opacity: 0.5;
+    pointer-events: none; /* Allows you to click "through" it */
+    font-size: 1.5rem; /* Match the editor's font size */
+    line-height: 1.8; /* Match the editor's line height */
+    transition: opacity 0.2s;
 }
 
 /* --- Loading Overlay --- */
