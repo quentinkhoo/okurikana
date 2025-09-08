@@ -51,9 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- CONVERSION LOGIC (Unchanged) ---
+    // --- CONVERSION LOGIC ---
     const handleInputConversion = async (currentBlock) => {
-        // ... (This function remains the same as your previous version)
         if (!kuroshiro || !currentBlock) return;
         try {
             const fragment = document.createDocumentFragment();
@@ -100,6 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENT LISTENERS ---
     const handleKeyPress = async (event) => {
+        // Check if an IME is actively composing a character
+        if (event.isComposing) {
+            return; // Do nothing; let the browser handle the IME confirmation
+        }
+        
         if (event.key !== 'Enter') return;
         event.preventDefault();
 
