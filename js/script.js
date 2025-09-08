@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const Kuroshiro = window.Kuroshiro.default;
             const KuromojiAnalyzer = window.KuromojiAnalyzer;
             kuroshiro = new Kuroshiro();
-            await kuroshiro.init(new KuromojiAnalyzer({ dictPath: '../dict' }));
+            await kuroshiro.init(new KuromojiAnalyzer({ dictPath: './dict' }));
         } catch (err) {
             console.error('Kuroshiro initialization failed:', err);
             loadingOverlay.innerHTML = '<p style="color: #ef4444;">Dictionary failed to load.</p>';
