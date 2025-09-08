@@ -155,11 +155,23 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeKuroshiro();
     editorArea.addEventListener('keydown', handleKeyPress);
 
-    // --- NEW: EVENT LISTENERS FOR PLACEHOLDER ---
+    // --- EVENT LISTENERS FOR PLACEHOLDER ---
     // Check visibility on keyup (after a character is typed)
     editorArea.addEventListener('keyup', updatePlaceholderVisibility);
     // Check visibility after pasting content
-    editorArea.addEventListener('paste', () => {
+    editorArea.addEventListener('paste', (event) => {
+        // Prevent the default paste behavior
+        event.preventDefault();
+
+        // Get the pasted text from the clipboard
+        const text = (event.clipboardData || window.clipboardData).getData('text');
+        
+        // Replace all newline characters with a new line
+        const normalizedText = text.replace(/\n/g, '<div><br></div>');
+        
+        // Insert the normalized text into the editor
+        document.execCommand('insertHTML', false, normalizedText);
+
         // Use a tiny delay to allow the paste event to complete
         setTimeout(updatePlaceholderVisibility, 0);
     });
