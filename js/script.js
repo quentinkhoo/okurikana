@@ -2,18 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const editorArea = document.getElementById('editor-area');
     const loadingOverlay = document.getElementById('loading-overlay');
     const themeToggleButton = document.getElementById('theme-toggle');
-    const placeholder = document.getElementById('placeholder'); // Get the new placeholder element
+    const placeholder = document.getElementById('placeholder');
     let kuroshiro = null;
 
-    // --- NEW: PLACEHOLDER VISIBILITY LOGIC ---
-    const updatePlaceholderVisibility = () => {
-        // If the editor has any text content (after trimming whitespace), hide the placeholder
-        if (editorArea.textContent.trim() !== '') {
-            placeholder.style.opacity = '0';
-        } else {
-            placeholder.style.opacity = '0.5';
-        }
-    };
 
     // --- THEME TOGGLE LOGIC ---
     const applyTheme = (theme) => {
@@ -45,134 +36,89 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingOverlay.innerHTML = '<p style="color: #ef4444;">Dictionary failed to load.</p>';
         } finally {
             loadingOverlay.classList.add('hidden');
-            editorArea.setAttribute('contenteditable', 'true');
+            editorArea.readOnly = false;
             editorArea.focus();
-            updatePlaceholderVisibility(); // Check placeholder state on load
         }
     };
 
-    // --- CONVERSION LOGIC ---
-    const handleInputConversion = async (currentBlock) => {
-        if (!kuroshiro || !currentBlock) return;
-        try {
-            const fragment = document.createDocumentFragment();
-            const childNodes = Array.from(currentBlock.childNodes);
-            for (const node of childNodes) {
-                if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-                    const rawText = await kuroshiro.convert(node.textContent, {
-                        mode: 'okurigana',
-                        to: 'hiragana',
-                    });
-                    const formattedHtml = rawText.replace(/\[(.*?)\]/g, '<em class="okurigana">[$1]</em>');
-                    const wrapperSpan = document.createElement('span');
-                    wrapperSpan.innerHTML = formattedHtml;
-                    fragment.appendChild(wrapperSpan);
-                } else {
-                    fragment.appendChild(node.cloneNode(true));
-                }
-            }
-            currentBlock.innerHTML = '';
-            currentBlock.appendChild(fragment);
-            const selection = window.getSelection();
-            const newRange = document.createRange();
-            newRange.selectNodeContents(currentBlock);
-            newRange.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(newRange);
-        } catch (err) {
-            console.error('Conversion failed:', err);
-        }
-    };
-    
-    // --- HELPER FUNCTION (Unchanged) ---
-    const findCurrentBlock = (range) => {
-        // ... (This function remains the same)
-        let node = range.startContainer;
-        if (node.nodeType === Node.TEXT_NODE) {
-            node = node.parentNode;
-        }
-        while (node && node.parentNode !== editorArea) {
-            node = node.parentNode;
-        }
-        return (node === editorArea) ? null : node;
-    };
+    const insertTextAtCursor = async (text) => {
+        let selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            let range = selection.getRangeAt(0);
+            range.deleteContents(); // Optional: remove any selected content
+            let textNode = document.createTextNode(text);
+            range.insertNode(textNode);
 
-    // --- EVENT LISTENERS ---
-    const handleKeyPress = async (event) => {
-        // Check if an IME is actively composing a character
-        if (event.isComposing) {
-            return; // Do nothing; let the browser handle the IME confirmation
-        }
-        
-        if (event.key !== 'Enter') return;
-        event.preventDefault();
-
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const range = selection.getRangeAt(0);
-        let currentBlock = findCurrentBlock(range);
-
-        if (!editorArea.firstChild) {
-            const firstDiv = document.createElement('div');
-            firstDiv.innerHTML = '<br>';
-            editorArea.appendChild(firstDiv);
-            range.setStart(firstDiv, 0);
-            range.collapse(true);
+            // Move the caret after the inserted text
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
             selection.removeAllRanges();
             selection.addRange(range);
+        }
+    }
+
+    // --- NEW GLOBAL CONVERSION ALGORITHM ---
+    const handleEnterPress = async (event) => {
+        if (event.isComposing || event.key !== 'Enter') {
             return;
         }
+        event.preventDefault();
+        if (!kuroshiro) return;
+
+        // 1. MARK: Get the current cursor position and place a unique marker string.
+        const cursorPosition = editorArea.selectionStart;
+        const originalValue = editorArea.value;
+        const CURSOR_MARKER = '||CURSOR||'; // A unique string that won't be in the text.
+
+        const textWithMarker = 
+            originalValue.substring(0, cursorPosition) + 
+            CURSOR_MARKER + 
+            originalValue.substring(cursorPosition);
+        console.log('Text with marker:', textWithMarker);
+
+        // 2. STRIP & PREPARE: Strip old furigana from the text.
+        const rawTextWithMarker = textWithMarker.replace(/[\(\（][あ-ん]+[\)\）]/g, '');
         
-        if (!currentBlock) {
-             console.warn("No valid block found; attempting recovery.");
-             const newBlock = document.createElement('div');
-             while (editorArea.firstChild) {
-                 newBlock.appendChild(editorArea.firstChild);
-             }
-             editorArea.appendChild(newBlock);
-             currentBlock = newBlock;
-             range.selectNodeContents(currentBlock);
-             range.collapse(false);
-             selection.removeAllRanges();
-             selection.addRange(range);
+        // Replace the marker with a newline *followed by* the marker.
+        // This inserts the line break for conversion while keeping our bookmark.
+        const textToConvert = rawTextWithMarker.replace(CURSOR_MARKER, '\n' + CURSOR_MARKER);
+
+        try {
+            // 3. RE-APPLY: Process the entire text block with Kuroshiro.
+            const convertedTextWithMarker = await kuroshiro.convert(textToConvert, {
+                mode: 'okurigana',
+                to: 'hiragana',
+            });
+
+            // 4. REBUILD & MOVE CURSOR: Find the marker's final position.
+            const newCursorPos = convertedTextWithMarker.indexOf(CURSOR_MARKER);
+            
+            // Remove the marker to get the final, clean text.
+            const finalText = convertedTextWithMarker.replace(CURSOR_MARKER, '');
+
+            // Set the editor's content to the final, converted text.
+            editorArea.value = finalText;
+
+            // Move the cursor to where the marker was.
+            if (newCursorPos !== -1) {
+                editorArea.focus();
+                editorArea.selectionStart = editorArea.selectionEnd = newCursorPos;
+            }
+            
+            // Ensure the new line is visible by scrolling if needed.
+            editorArea.scrollTop = editorArea.scrollHeight;
+
+        } catch (err) {
+            console.error('Global conversion failed:', err);
         }
-
-        await handleInputConversion(currentBlock);
-
-        const newDiv = document.createElement('div');
-        newDiv.innerHTML = '<br>';
-        currentBlock.insertAdjacentElement('afterend', newDiv);
-        range.setStart(newDiv, 0);
-        range.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(range);
     };
+
 
     // --- INITIALIZATION ---
     const savedTheme = localStorage.getItem('theme') || 'light';
     applyTheme(savedTheme);
     initializeKuroshiro();
-    editorArea.addEventListener('keydown', handleKeyPress);
-
-    // --- EVENT LISTENERS FOR PLACEHOLDER ---
-    // Check visibility on keyup (after a character is typed)
-    editorArea.addEventListener('keyup', updatePlaceholderVisibility);
-    // Check visibility after pasting content
-    editorArea.addEventListener('paste', (event) => {
-        // Prevent the default paste behavior
-        event.preventDefault();
-
-        // Get the pasted text from the clipboard
-        const text = (event.clipboardData || window.clipboardData).getData('text');
-        
-        // Replace all newline characters with a new line
-        const normalizedText = text.replace(/\n/g, '<div><br></div>');
-        
-        // Insert the normalized text into the editor
-        document.execCommand('insertHTML', false, normalizedText);
-
-        // Use a tiny delay to allow the paste event to complete
-        setTimeout(updatePlaceholderVisibility, 0);
-    });
+    editorArea.addEventListener('keydown', handleEnterPress);
+;
 });
+
