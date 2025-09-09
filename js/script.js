@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
             originalValue.substring(0, cursorPosition) + 
             CURSOR_MARKER + 
             originalValue.substring(cursorPosition);
-        console.log('Text with marker:', textWithMarker);
 
         // 2. STRIP & PREPARE: Strip old furigana from the text.
         const rawTextWithMarker = textWithMarker.replace(/[\(\（][あ-ん]+[\)\）]/g, '');
