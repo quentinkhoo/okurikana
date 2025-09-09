@@ -6,20 +6,43 @@ document.addEventListener('DOMContentLoaded', () => {
     let kuroshiro = null;
 
 
-    // --- THEME TOGGLE LOGIC ---
+     // --- THEME CYCLING LOGIC ---
+    const themes = ['light', 'pink', 'dark'];
+
     const applyTheme = (theme) => {
-        if (theme === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeToggleButton.textContent = '☀️';
-        } else {
-            document.body.classList.remove('dark-mode');
-            themeToggleButton.textContent = '🌙';
+        // First, clear any existing theme classes
+        document.body.classList.remove('dark-mode', 'pink-mode');
+
+        // Apply the correct class and set the next icon
+        switch (theme) {
+            case 'dark':
+                document.body.classList.add('dark-mode');
+                themeToggleButton.textContent = '⚡️'; 
+                break;
+            case 'pink':
+                document.body.classList.add('pink-mode');
+                themeToggleButton.textContent = '🌚'; 
+                break;
+            default: // 'light' theme
+                themeToggleButton.textContent = '🌸'; 
+                break;
         }
     };
 
     themeToggleButton.addEventListener('click', () => {
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        const newTheme = isDarkMode ? 'light' : 'dark';
+        // Determine the current theme
+        let currentTheme = 'light';
+        if (document.body.classList.contains('dark-mode')) {
+            currentTheme = 'dark';
+        } else if (document.body.classList.contains('pink-mode')) {
+            currentTheme = 'pink';
+        }
+
+        // Find the index of the current theme and get the next one
+        const currentIndex = themes.indexOf(currentTheme);
+        const newTheme = themes[(currentIndex + 1) % themes.length];
+        
+        // Save and apply the new theme
         localStorage.setItem('theme', newTheme);
         applyTheme(newTheme);
     });

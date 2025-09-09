@@ -21,16 +21,30 @@
 
 /* 🌙 Dark Theme Variables */
 body.dark-mode {
-    --bg-color: #1a1a2e;
-    --surface-color: #16213e;
-    --text-color: #e0e0e0;
-    --accent-color: #7b68ee;
-    --border-color: #0f3460;
-    --placeholder-color: #7a7a7a;
-    --shadow-color: rgba(22, 33, 62, 0.5);
+    --bg-color: #0d1b2a; /* Midnight Blue */
+    --surface-color: #1b263b; /* Dark Slate Blue */
+    --text-color: #e0e1dd; /* Light Gray */
+    --accent-color: #415a77; /* Shadow Blue */
+    --border-color: #778da9; /* Slate Gray */
+    --placeholder-color: #6c757d;
+    --shadow-color: rgba(0, 0, 0, 0.2);
     --editor-border-color: rgba(255, 255, 255, 0.2);
-    --accent-glow-dark: rgba(123, 104, 238, 0.25);
-    --header-footer-bg: rgba(255, 255, 255, 0.05);
+    --accent-glow-dark: rgba(65, 90, 119, 0.25);
+    --header-footer-bg: rgba(27, 38, 59, 0.7); /* Dark Slate Blue with transparency */
+}
+
+/* 🌸 Pink Theme Variables (NEW) */
+body.pink-mode {
+    --bg-color: #FCE4EC; /* Soft Pink */
+    --surface-color: #FFFFFF;
+    --text-color: #8D3A62; /* Deep Raspberry */
+    --accent-color: #E91E63; /* Vibrant Pink */
+    --border-color: #F48FB1; /* Lighter Pink Border */
+    --placeholder-color: #B1879B;
+    --shadow-color: rgba(244, 182, 194, 0.5);
+    --editor-border-color: rgba(141, 58, 98, 0.2);
+    --accent-glow-pink: rgba(233, 30, 99, 0.25);
+    --header-footer-bg: rgba(255, 255, 255, 0.7);
 }
 
 /* --- Base & Body --- */
@@ -117,6 +131,7 @@ header::before, header::after {
     opacity: 0.9;
     pointer-events: none;
     z-index: -1;
+    transition: width 0.3s, height 0.3s;
 }
 
 header::before {
@@ -129,32 +144,54 @@ header::after {
     right: 20px;
 }
 
+/* Dark Theme Images */
+body.dark-mode header::before {
+    background-image: url('../images/piplup.png'); 
+}
+body.dark-mode header::after {
+    background-image: url('../images/chiikawa.png');
+}
+
+/* Pink Theme Images */
+body.pink-mode header::before {
+    background-image: url('../images/opanchu_usagi.png');
+}
+body.pink-mode header::after {
+    background-image: url('../images/anya.png');
+}
+
 @media (max-width: 640px) {
-    header::before, header::after { display: none; }
+    header::before, header::after { 
+        width: 50px;
+        height: 50px;
+    }
+    header::before {
+        left: 5px;
+    }
+    header::after {
+        right: 5px;
+    }
 }
 
 /* --- Main Editor Area --- */
-/* The main container now also provides the padding around the editor. */
 main {
     background-color: var(--surface-color);
     border-radius: 1rem;
     box-shadow: 0 10px 25px -5px var(--shadow-color);
-    padding: 0.5rem; /* Creates a small gap between the edge and the editor's new border */
+    padding: 0.5rem;
 }
 
-/* The wrapper is now a simple relative container. */
 .editor-wrapper {
     position: relative;
 }
 
-/* ✨ The editor area now has a visible border and no padding. */
 #editor-area {
     width: 100%;
-    padding: 1rem; /* Added some padding back for better UX, text was too close to edge */
-    box-sizing: border-box; /* Ensures this padding is inside the width */
+    padding: 1rem;
+    box-sizing: border-box;
     background-color: var(--surface-color);
-    border: 2px solid var(--border-color); /* The new border */
-    border-radius: 0.7rem; /* Rounded corners for the editor itself */
+    border: 2px solid var(--border-color);
+    border-radius: 0.7rem;
     font-size: 1.5rem;
     color: var(--text-color);
     min-height: 500px;
@@ -165,8 +202,8 @@ main {
     overflow-y: auto;
     overflow-wrap: break-word;
     caret-color: var(--text-color); 
-    font-family: inherit; /* Ensures it uses the same font as the body */
-    resize: vertical;     /* Allows users to resize vertically, which is often helpful */
+    font-family: inherit;
+    resize: vertical;
 }
 
 /* --- Custom Scrollbar for Editor --- */
@@ -186,8 +223,8 @@ main {
 #editor-area::placeholder {
     color: var(--placeholder-color);
     opacity: 0.5;
-    font-size: 1.5rem;   /* Match your editor's font size */
-    line-height: 1.8;  /* Match your editor's line height */
+    font-size: 1.5rem;
+    line-height: 1.8;
 }
 
 /* --- Loading Overlay --- */
@@ -207,6 +244,10 @@ main {
 
 body.dark-mode #loading-overlay {
     background-color: rgba(22, 33, 62, 0.85);
+}
+
+body.pink-mode #loading-overlay {
+    background-color: rgba(255, 255, 255, 0.85);
 }
 
 .spinner {
@@ -252,4 +293,3 @@ body.dark-mode #loading-overlay {
 #theme-toggle:active {
     transform: scale(0.95);
 }
-
